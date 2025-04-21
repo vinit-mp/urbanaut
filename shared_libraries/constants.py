@@ -1,3 +1,4 @@
+from google.genai import types
 
 SYSTEM_TIME = "_time"
 ITIN_INITIALIZED = "_itin_initialized"
@@ -11,3 +12,7 @@ ITIN_DATETIME = "itinerary_datetime"
 
 START_DATE = "start_date"
 END_DATE = "end_date"
+
+json_response_config = types.GenerateContentConfig(
+    response_mime_type="application/json"
+)

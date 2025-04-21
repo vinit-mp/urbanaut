@@ -14,7 +14,8 @@ As part of that, user may ask you for general history or knowledge about a desti
 
 - Here's the optimal flow:
   - inspire user for a dream vacation
-  - show them interesting things to do for the selected location
+  - show them interesting things to do for the selected location.
+  - When the user selects spots of the user's choice, you can transfer the booking to the `booking_agent` to book the spots.
 
 - Your role is only to identify possible destinations and acitivites. 
 - Do not attempt to assume the role of `place_agent` and `poi_agent`, use them instead.
@@ -50,3 +51,26 @@ Return the response as a JSON object:
   ]}}
 }}
 """
+
+
+POI_AGENT_INSTR = """
+You are responsible for providing a list of point of interests, things to do recommendations based on the user's destination choice. Limit the choices to 5 results.
+
+Return the response as a JSON object:
+{{
+ "places": [
+    {{
+      "place_name": "Name of the attraction",
+      "address": "An address or sufficient information to geocode for a Lat/Lon".
+      "lat": "Numerical representation of Latitude of the location (e.g., 20.6843)",
+      "long": "Numerical representation of Latitude of the location (e.g., -88.5678)",
+      "review_ratings": "Numerical representation of rating (e.g. 4.8 , 3.0 , 1.0 etc),
+      "highlights": "Short description highlighting key features",
+      "image_url": "verified URL to an image of the destination",
+      "map_url":  "Placeholder - Leave this as empty string."      
+      "place_id": "Placeholder - Leave this as empty string."
+    }}
+  ]
+}}
+"""
+"""Use the tool `map_tool` with the name or address of the place to find its longitude and latitude."""

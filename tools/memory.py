@@ -1,6 +1,3 @@
-
-
-
 from datetime import datetime
 import json
 import os
@@ -14,6 +11,13 @@ SAMPLE_SCENARIO_PATH = os.getenv(
     "TRAVEL_CONCIERGE_SCENARIO", "shared_libraries\dummy.json"
 )
 def _set_initial_states(source: Dict[str, Any], target: State | dict[str, Any]):
+    """
+    Setting the initial session state given a JSON object of states.
+
+    Args:
+        source: A JSON object of states.
+        target: The session state object to insert into.
+    """
 
     if constants.SYSTEM_TIME not in target:
         target[constants.SYSTEM_TIME] = str(datetime.now())
@@ -31,6 +35,14 @@ def _set_initial_states(source: Dict[str, Any], target: State | dict[str, Any]):
 
 
 def _load_precreated_itinerary(callback_context: CallbackContext):
+    """
+    Sets up the initial state.
+    Set this as a callback as before_agent_call of the root_agent.
+    This gets called before the system instruction is contructed.
+
+    Args:
+        callback_context: The callback context.
+    """
  
     data = {}
     with open(SAMPLE_SCENARIO_PATH, "r") as file:
