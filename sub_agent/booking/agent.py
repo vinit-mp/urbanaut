@@ -14,7 +14,7 @@ create_reservation = Agent(
     instruction=prompt.CONFIRM_RESERVATION_INSTR,
     output_key="booking_data",
         generate_content_config=json_response_config,
-        tools=[       get_booking_data(after_date= prompt.SYSTEM_TIME, )]
+        tools=[get_booking_data(after_date=prompt.SYSTEM_TIME, before_date=prompt.START_DATE)]
 
 )
 
