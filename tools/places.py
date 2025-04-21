@@ -1,8 +1,10 @@
 from datetime import datetime
 import json
 from google.adk.tools import ToolContext
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Union
 import requests
+from shared_libraries.data_types import SpotSearch, SearchRequest
+from shared_libraries.constants import SYSTEM_TIME
 
 
 def get_location_details(self, query: str, tool_context: ToolContext) -> Dict[str, str]:
@@ -53,39 +55,33 @@ def get_location_details(self, query: str, tool_context: ToolContext) -> Dict[st
         except requests.exceptions.RequestException as e:
             return {"error": f"Error fetching place data: {e}"}
 
-def execute_search(json_data):
-        """
-            Search queries for Urbanaut's events and experiences in a selected city.      
-        Args:
-            json_data: Contains the ddatapoints that the urbanaut api accepts calls in.
+def execute_search(tool_context: ToolContext):
+    city = tool_context.state["city"];
+
+    payload ={"searches":[{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=experiences) &&  (end_timestamp:>=${SYSTEM_TIME} || has_end_timestamp:false )","sort_by":"coming_soon:asc,display_rank:asc,_eval(instant_booking:true):desc"},{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":f"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=buy) &&  (end_timestamp:>=1745247417 || has_end_timestamp:false )","sort_by":"display_rank:asc,modified_timestamp:desc"}]}
+    """
+    Search queries for Urbanaut's events and experiences in a selected city.      
+    Args:
+        payload: Dictionary containing search parameters
             
-        Returns:
+    Returns:
         dict: Parsed search queries with human-readable information.
-            
-        """
-        
-        url ="https://search.urbanaut.app/multi_search"
-        try:
-            headers = {
-                "Content-Type": "application/json",
-                "User-Agent": "Python Script"
-                }
-            if isinstance(json_data, str):
-                payload = json.loads(json_data)
-            else:
-                payload = json_data
-                response = requests.post(url, json=payload, headers=headers)
+    """
+    url = "https://search.urbanaut.app/multi_search"
+    try:
+        headers = {
+            "Content-Type": "application/json",
+            "User-Agent": "Python Script"
+        }
+        response = requests.post(url, json=payload, headers=headers)
                 
-                
-            if response.status_code == 200:
-                return response.json()
-            else:
-                return f"Error: {response.status_code} - {response.text}"
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return f"Error: {response.status_code} - {response.text}"
         
-        
-        except Exception as e:
-            return f"Exception occurred: {str(e)}"
-        
+    except Exception as e:
+        return f"Exception occurred: {str(e)}"
 def get_map_url( place_id: str) -> str:
         """Generates the Google Maps URL for a given place ID."""
         return f"https://www.google.com/maps/place/?q=place_id:{place_id}"
@@ -123,7 +119,6 @@ def map_tool(key: str, tool_context: ToolContext):
             poi["lat"] = result["lat"]
             poi["long"] = result["lng"]
     
-    print(f" ::: {pois}")
     return {"places": pois} 
 
 
@@ -155,8 +150,8 @@ def parse_search_queries(json_data, url=None):
         query_info = {
             "query_index": i + 1,
             "collection": search.get("collection"),
-            "category": None,  # Will be extracted from filter_by
-            "location": None,  # Will be extracted from filter_by
+            "category": None, 
+            "location": None,  
             "pagination": {
                 "page": search.get("page"),
                 "per_page": search.get("per_page")
@@ -169,21 +164,17 @@ def parse_search_queries(json_data, url=None):
             }
         }
         
-        # Extract filters
         filter_by = search.get("filter_by", "")
         
-        # Extract category from filter_by
         import re
         category_match = re.search(r'categories_name:=\s*([^&]+)', filter_by)
         if category_match:
             query_info["category"] = category_match.group(1).strip()
             
-        # Extract location from filter_by
         location_match = re.search(r'city_data\.slug:=\s*([^&]+)', filter_by)
         if location_match:
             query_info["location"] = location_match.group(1).strip()
             
-        # Extract timestamp info
         timestamp_match = re.search(r'end_timestamp:>=\s*(\d+)', filter_by)
         if timestamp_match:
             timestamp = int(timestamp_match.group(1))

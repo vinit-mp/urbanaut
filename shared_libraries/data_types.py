@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 class POI(BaseModel):
     """A Point Of Interest suggested by the agent."""
@@ -41,3 +41,6 @@ class DesintationIdeas(BaseModel):
 class POISuggestions(BaseModel):
     """Points of interest recommendation."""
     places: list[POI]
+
+
+

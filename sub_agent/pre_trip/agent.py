@@ -3,7 +3,7 @@ from shared_libraries.constants import json_response_config
 from shared_libraries.data_types import DesintationIdeas, POISuggestions
 from sub_agent.pre_trip import prompt
 from google.adk.tools.agent_tool import AgentTool
-from tools.places import map_tool
+from tools.places import execute_search, map_tool
 
 
 
@@ -37,5 +37,5 @@ pre_trip_agent = Agent(
     name="pre_trip_agent",
     description="A travel inspiration agent who inspire users, and discover their next vacations; Provide information about places, activities, interests,",
     instruction=prompt.PRE_TRIP_AGENT_INSTR,
-    tools=[AgentTool(agent=place_agent), AgentTool(agent=poi_agent), map_tool],
+    tools=[AgentTool(agent=place_agent), AgentTool(agent=poi_agent), map_tool,execute_search],
 )
