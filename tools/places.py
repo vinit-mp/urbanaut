@@ -21,7 +21,7 @@ def get_location_details(self, query: str, tool_context: ToolContext) -> Dict[st
             "slug": f"{query}",
         }
         if "city" not in tool_context.state["city"]:
-            tool_context.state[key]["city"] = []
+            tool_context.state["city"] = []
 
         try:
             response = requests.get(urbanaut_base, params=params)
