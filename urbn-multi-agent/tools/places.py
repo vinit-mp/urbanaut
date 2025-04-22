@@ -5,11 +5,12 @@ from typing import Dict, List, Any, Union
 import requests
 from ..shared_libraries.data_types import POI, Destination
 from ..shared_libraries.constants import SYSTEM_TIME
+from ..shared_libraries import shared_preferences
 
 
 def get_location_details(self, query: str, tool_context: ToolContext) -> Dict[str, str]:
         """
-            This is used to fetch the city deatils that the user is enquiring about, or want to visit.       
+            This is used to fetch the city details that the user is enquiring about, or want to visit.       
         Args:
             query: The city that needs to be searched.
             tool_context: The ADK tool context.
@@ -18,18 +19,20 @@ def get_location_details(self, query: str, tool_context: ToolContext) -> Dict[st
             The updated state with the full JSON object under the key.
             
         """
-        urbanaut_base = f"https://dev.urbanaut.app/api/v4/city/?slug={query}"
+        urbanaut_base = f"https://urbanaut.app/api/v4/city/?slug={query}"
         params = {
             "slug": f"{query}",
         }
-        if "city" not in tool_context.state["city"]:
-            tool_context.state["city"] = []
+        
+        if not hasattr(tool_context.state, "city"):
+            tool_context.state.city = query
+        else:
+            tool_context.state.city = query
 
         try:
             response = requests.get(urbanaut_base, params=params)
             response.raise_for_status()
             place_data = response.json()
-
 
             if not place_data.get("results"):
                 return {"error": "No places found."}
@@ -55,7 +58,7 @@ def get_location_details(self, query: str, tool_context: ToolContext) -> Dict[st
         except requests.exceptions.RequestException as e:
             return {"error": f"Error fetching place data: {e}"}
 
-def execute_search(tool_context: ToolContext):
+def execute_search():
     """
     Search queries for Urbanaut's events and experiences in a selected city.      
     Args:
@@ -64,19 +67,20 @@ def execute_search(tool_context: ToolContext):
     Returns:
         dict: Parsed search queries with human-readable information.
     """
-    city = tool_context.state["city"]
+    if not hasattr(ToolContext.state, "city"):
+        return {"error": "No city selected"}
+        
+    city = ToolContext.state.city
+    getSPInstance = shared_preferences.SharedPreferences
+    getSPInstance.put_string(key="city",value=)
+
     payload ={"searches":[{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=experiences) &&  (end_timestamp:>=${SYSTEM_TIME} || has_end_timestamp:false )","sort_by":"coming_soon:asc,display_rank:asc,_eval(instant_booking:true):desc"},{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":f"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=buy) &&  (end_timestamp:>=1745247417 || has_end_timestamp:false )","sort_by":"display_rank:asc,modified_timestamp:desc"}]}
     
-    
-    
-    
-    
-
     url = "https://search.urbanaut.app/multi_search"
     try:
         headers = {
             "Content-Type": "application/json",
-            "User-Agent": "Python Script"
+            "Accept":"application/json"
         }
         response = requests.post(url, json=payload, headers=headers)
                 
@@ -94,10 +98,6 @@ def get_map_url( place_id: str) -> str:
         return f"https://www.google.com/maps/place/?q=place_id:{place_id}"
 
 
-
-
-
-
 def map_tool(key: str, tool_context: ToolContext):
     """
     This is going to inspect the pois stored under the specified key in the state.
@@ -110,6 +110,8 @@ def map_tool(key: str, tool_context: ToolContext):
     Returns:
         The updated state with the full JSON object under the key.
     """
+
+
     if key not in tool_context.state:
         tool_context.state[key] = {}
 
@@ -125,7 +127,6 @@ def map_tool(key: str, tool_context: ToolContext):
         if "lat" in result and "lng" in result:
             poi["lat"] = result["lat"]
             poi["long"] = result["lng"]
-    
     return {"places": pois} 
 
 

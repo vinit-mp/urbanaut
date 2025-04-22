@@ -8,20 +8,19 @@ from ...tools.places import execute_search, map_tool
 
 
 place_agent = Agent(
-    model="gemini-2.0-flash",
+    model="gemini-2.0-flash-001",
     name="place_agent",
     instruction=prompt.PLACE_AGENT_INSTR,
     description="This agent suggests a few destination given some user preferences",
     disallow_transfer_to_parent=True,
     disallow_transfer_to_peers=True,
-    output_schema=DesintationIdeas,
     output_key="place",
     generate_content_config=json_response_config,
 )
 
 
 poi_agent = Agent(
-    model="gemini-2.0-flash",
+    model="gemini-2.0-flash-001",
     name="poi_agent",
     description="This agent suggests a few activities and points of interests given a destination",
     instruction=prompt.POI_AGENT_INSTR,
@@ -33,9 +32,9 @@ poi_agent = Agent(
 )
 
 pre_trip_agent = Agent(
-    model="gemini-2.0-flash",
+    model="gemini-2.0-flash-001",
     name="pre_trip_agent",
     description="A travel inspiration agent who inspire users, and discover their next vacations; Provide information about places, activities, interests,",
     instruction=prompt.PRE_TRIP_AGENT_INSTR,
-    tools=[AgentTool(agent=place_agent), AgentTool(agent=poi_agent), map_tool,execute_search],
+    tools=[AgentTool(agent=place_agent),  execute_search, AgentTool(agent=poi_agent), map_tool],
 )
