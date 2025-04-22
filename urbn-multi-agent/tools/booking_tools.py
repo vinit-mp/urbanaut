@@ -3,12 +3,12 @@ from typing import Dict, List, Any
 import requests
 from datetime import datetime
 
-def get_booking_data(slug: str, after_date: str = None, before_date: str = None) -> Dict[str, Any]:
+def get_booking_data(tool: ToolContext = None, after_date: str = None, before_date: str = None) -> Dict[str, Any]:
     """
     Get booking data for a specific experience using its slug and process the booking.
     
     Args:
-        slug (str): The unique identifier for the experience
+        tool (ToolContext, optional): The tool context containing state information
         after_date (str, optional): Start date in YYYY-MM-DD format
         before_date (str, optional): End date in YYYY-MM-DD format
         
@@ -16,6 +16,12 @@ def get_booking_data(slug: str, after_date: str = None, before_date: str = None)
         Dict[str, Any]: The API response containing booking data
     """
     base_url = "https://urbanaut.app/api/v4/spot/approved/booking/data"
+    
+    if tool is None or "city" not in tool.state:
+        raise ValueError("Tool context is required and must contain 'city' in its state")
+        
+    slug = tool.state["city"]
+
     url = f"{base_url}/{slug}/"
     
     params = {}

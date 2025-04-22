@@ -1,9 +1,9 @@
 from google.adk.agents import Agent
-from shared_libraries.constants import json_response_config
-from shared_libraries.data_types import DesintationIdeas, POISuggestions
-from sub_agent.pre_trip import prompt
+from ...shared_libraries.constants import json_response_config
+from ...shared_libraries.data_types import DesintationIdeas, POISuggestions
+from . import prompt
 from google.adk.tools.agent_tool import AgentTool
-from tools.places import execute_search, map_tool
+from ...tools.places import execute_search, map_tool
 
 
 

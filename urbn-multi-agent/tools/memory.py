@@ -5,10 +5,10 @@ from typing import Dict, Any
 from google.adk.agents.callback_context import CallbackContext
 from google.adk.sessions.state import State
 from google.adk.tools import ToolContext
-from shared_libraries import constants
+from ..shared_libraries import constants
 
 SAMPLE_SCENARIO_PATH = os.getenv(
-    "TRAVEL_CONCIERGE_SCENARIO", "shared_libraries\dummy.json"
+    "TRAVEL_CONCIERGE_SCENARIO", os.path.join("shared_libraries", "dummy.json")
 )
 def _set_initial_states(source: Dict[str, Any], target: State | dict[str, Any]):
     """
@@ -43,13 +43,29 @@ def _load_precreated_itinerary(callback_context: CallbackContext):
     Args:
         callback_context: The callback context.
     """
- 
-    data = {}
-    with open(SAMPLE_SCENARIO_PATH, "r") as file:
-        data = json.load(file)
-        print(f"\nLoading Initial State: {data}\n")
-
-    _set_initial_states(data["state"], callback_context.state)
+    try:
+        data = {}
+        with open(SAMPLE_SCENARIO_PATH, "r") as file:
+            data = json.load(file)
+            print(f"\nLoading Initial State: {data}\n")
+    except FileNotFoundError:
+        print(f"Error: Could not find scenario file at {SAMPLE_SCENARIO_PATH}")
+        data = {}
+    except json.JSONDecodeError:
+        print(f"Error: Invalid JSON in scenario file at {SAMPLE_SCENARIO_PATH}")
+        data = {}
+    except Exception as e:
+        print(f"Error loading scenario file: {str(e)}")
+        data = {}
+    
+    # Only set initial states if we have valid data with a state key
+    if data and "state" in data:
+        _set_initial_states(data["state"], callback_context.state)
+    else:
+        print("No valid state data found, using empty state")
+        _set_initial_states({}, callback_context.state)
+        
+    return data
 
 
 

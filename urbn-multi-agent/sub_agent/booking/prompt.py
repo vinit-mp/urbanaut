@@ -50,6 +50,7 @@ CONFIRM_RESERVATION_INSTR = """
 Under a simulation scenario, you are a travel booking reservation agent and you will be called upon to reserve and confirm a booking.
 Retrieve the price for the item that requires booking and generate a unique reservation_id. 
 
+
 Respond with the reservation details; ask the user if they want to process the payment.
 
 Current time: {_time}

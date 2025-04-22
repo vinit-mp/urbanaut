@@ -3,8 +3,8 @@ import json
 from google.adk.tools import ToolContext
 from typing import Dict, List, Any, Union
 import requests
-from shared_libraries.data_types import SpotSearch, SearchRequest
-from shared_libraries.constants import SYSTEM_TIME
+from ..shared_libraries.data_types import POI, Destination
+from ..shared_libraries.constants import SYSTEM_TIME
 
 
 def get_location_details(self, query: str, tool_context: ToolContext) -> Dict[str, str]:
@@ -56,9 +56,6 @@ def get_location_details(self, query: str, tool_context: ToolContext) -> Dict[st
             return {"error": f"Error fetching place data: {e}"}
 
 def execute_search(tool_context: ToolContext):
-    city = tool_context.state["city"];
-
-    payload ={"searches":[{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=experiences) &&  (end_timestamp:>=${SYSTEM_TIME} || has_end_timestamp:false )","sort_by":"coming_soon:asc,display_rank:asc,_eval(instant_booking:true):desc"},{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":f"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=buy) &&  (end_timestamp:>=1745247417 || has_end_timestamp:false )","sort_by":"display_rank:asc,modified_timestamp:desc"}]}
     """
     Search queries for Urbanaut's events and experiences in a selected city.      
     Args:
@@ -67,6 +64,14 @@ def execute_search(tool_context: ToolContext):
     Returns:
         dict: Parsed search queries with human-readable information.
     """
+    city = tool_context.state["city"]
+    payload ={"searches":[{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=experiences) &&  (end_timestamp:>=${SYSTEM_TIME} || has_end_timestamp:false )","sort_by":"coming_soon:asc,display_rank:asc,_eval(instant_booking:true):desc"},{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":f"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=buy) &&  (end_timestamp:>=1745247417 || has_end_timestamp:false )","sort_by":"display_rank:asc,modified_timestamp:desc"}]}
+    
+    
+    
+    
+    
+
     url = "https://search.urbanaut.app/multi_search"
     try:
         headers = {
@@ -82,6 +87,8 @@ def execute_search(tool_context: ToolContext):
         
     except Exception as e:
         return f"Exception occurred: {str(e)}"
+    
+    
 def get_map_url( place_id: str) -> str:
         """Generates the Google Maps URL for a given place ID."""
         return f"https://www.google.com/maps/place/?q=place_id:{place_id}"

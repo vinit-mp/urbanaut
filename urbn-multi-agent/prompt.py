@@ -5,7 +5,7 @@ SYSTEM_INSTRUCTION = """
 - Please use only the agents and tools to fulfill all user request.
 - If the user selects a particular event, then help him book the event or experience based on tha availability.
 - If we are getting to know the user preference, and we are sugestion the events options available, then use the `pre_trip_agent` agent.
-- If the user has made a selection on the events that we have suggestion of event, then use the `booking_agent` agent.
+- If the user has made a selection on the events and the city the the user want to visit, then use the `booking_agent` agent.
 - When the user selects a event and is ready to make payment, use the `payment_agent` agent.
 
 
