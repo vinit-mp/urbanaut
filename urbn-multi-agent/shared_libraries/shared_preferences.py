@@ -5,16 +5,13 @@ from appdirs import user_data_dir
 
 class SharedPreferences:
     def __init__(self, app_name, app_author):
-        # Get platform-specific app data directory
         self.data_dir = user_data_dir(app_name, app_author)
         self.pref_file = os.path.join(self.data_dir, "preferences.json")
         self.prefs = {}
         
-        # Create directory if it doesn't exist
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
         
-        # Load existing preferences
         self.load()
     
     def load(self):
@@ -24,7 +21,6 @@ class SharedPreferences:
                 with open(self.pref_file, 'r') as f:
                     self.prefs = json.load(f)
             except (json.JSONDecodeError, IOError):
-                # Reset preferences if file is corrupted
                 self.prefs = {}
     
     def save(self):

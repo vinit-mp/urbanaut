@@ -1,9 +1,26 @@
 from google.adk.agents import Agent
 from ...shared_libraries.constants import json_response_config
 from ...shared_libraries.data_types import DesintationIdeas, POISuggestions
+from ...shared_libraries.shared_preferences import SharedPreferences 
 from . import prompt
 from google.adk.tools.agent_tool import AgentTool
 from ...tools.places import execute_search, map_tool
+from google.adk.agents.callback_context import CallbackContext
+
+ 
+
+
+def set_city_key(callback_context: CallbackContext):
+      """
+      This is used to setpu a shared preference key called city. to store the city chosen by the user to search for events.             
+      Returns:
+      The updated state with the full JSON object under the key.
+      """
+      shared_preferrence =  SharedPreferences()
+      shared_preferrence.put_string(key="city", value="")
+
+
+
 
 
 
@@ -15,8 +32,9 @@ place_agent = Agent(
     disallow_transfer_to_parent=True,
     disallow_transfer_to_peers=True,
     output_key="place",
-    generate_content_config=json_response_config,
+    generate_content_config=json_response_config,    
 )
+
 
 
 poi_agent = Agent(

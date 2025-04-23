@@ -24,6 +24,12 @@ def get_location_details(self, query: str, tool_context: ToolContext) -> Dict[st
             "slug": f"{query}",
         }
         
+
+
+        print(f"::: called city here in get_location_details {query}")
+        prefs = shared_preferences.SharedPreferences("urbanaut", "urbanaut")
+        prefs.put_string("city", query)
+        
         if not hasattr(tool_context.state, "city"):
             tool_context.state.city = query
         else:
@@ -67,12 +73,11 @@ def execute_search():
     Returns:
         dict: Parsed search queries with human-readable information.
     """
-    if not hasattr(ToolContext.state, "city"):
-        return {"error": "No city selected"}
+
         
-    city = ToolContext.state.city
     getSPInstance = shared_preferences.SharedPreferences
-    getSPInstance.put_string(key="city",value=)
+    city= getSPInstance.get_string(key="city")
+    print(f"::: city value 0 {city}")
 
     payload ={"searches":[{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=experiences) &&  (end_timestamp:>=${SYSTEM_TIME} || has_end_timestamp:false )","sort_by":"coming_soon:asc,display_rank:asc,_eval(instant_booking:true):desc"},{"collection":"spot_approved","query_by":"name","num_typos":1,"typo_tokens_threshold":1,"highlight_full_fields":"name","q":"*","facet_by":"","max_facet_values":50,"page":1,"per_page":249,"include_fields":"*, $category(*, strategy:nest_array) as category_data, $account(*) as account_data, $review(*), $city(*) as city_data, $contributor(*), $who_is_it_for_tag(*)","filter_by":f"enable_list_view:=true && $city(slug:=${city}) && $category(slug:=buy) &&  (end_timestamp:>=1745247417 || has_end_timestamp:false )","sort_by":"display_rank:asc,modified_timestamp:desc"}]}
     
